@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports: ["8095:9090"]
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-remote-write-receiver'
+    networks: [test-net]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["8096:3000"]
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks: [test-net]
+    depends_on: [prometheus]
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8101:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app-consumer-1
+      - app-consumer-2
+    networks:
+      - test-net
+
+  app-consumer-1:
+    build: ./ConsumeService1
+    environment:
+      - SERVER_PORT=8081
+    ports:
+      - "8097:8081"
+    networks:
+      - test-net
+    hostname: app-consumer-1
+
+  app-process-1:
+    build: ./ProcessService1
+    environment:
+      - SERVER_PORT=8083
+    ports: ["8098:8083"]
+    networks: [test-net]
+    hostname: app-process-1
+
+  app-consumer-2:
+    build: ./ConsumeService2
+    environment:
+      - SERVER_PORT=8082
+    ports:
+      - "8099:8082"
+    networks:
+      - test-net
+    hostname: app-consumer-2
+
+  app-process-2:
+    build: ./ProcessService2
+    environment:
+      - SERVER_PORT=8084  # ← Spring Boot слушает 8083!
+    ports: [ "8102:8084" ]
+    networks: [ test-net ]
+    hostname: app-process-2
+
+networks:
+  test-net:
+    driver: bridge
