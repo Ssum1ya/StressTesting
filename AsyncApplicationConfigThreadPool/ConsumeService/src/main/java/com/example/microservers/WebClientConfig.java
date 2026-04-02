@@ -17,9 +17,12 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient() {
         ConnectionProvider provider = ConnectionProvider.builder("custom")
-                .maxConnections(200)
+                .maxConnections(400)
                 .maxIdleTime(Duration.ofSeconds(20))
+                .maxLifeTime(Duration.ofMinutes(5))
                 .pendingAcquireMaxCount(1000)
+                .pendingAcquireTimeout(Duration.ofSeconds(10))
+                .metrics(true)
                 .build();
 
         return WebClient.builder()

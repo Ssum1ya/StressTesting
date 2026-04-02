@@ -16,17 +16,17 @@ public class K6Service {
     private final String pathToJsRestApiApplication = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressRestApiApplication.js";
     private final String prometheusUrlRestApiApplication = "http://localhost:9090/api/v1/write";
 
-    private final String pathToJsAsyncApplication = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressAsyncApplication.js";
-    private final String prometheusUrlAsyncApplication = "http://localhost:8085/api/v1/write";
+    private final String pathToStressWebFlux = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressWebFlux.js";
+    private final String prometheusUrlWebFlux = "http://localhost:8089/api/v1/write";
 
-    private final String pathToJsAsyncConfigApplication = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressAsyncConfigPoolApplication.js";
-    private final String prometheusUrlAsyncConfigApplication = "http://localhost:8089/api/v1/write";
+    private final String pathToStressFuture = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressFuture.js";
+    private final String prometheusUrlFuture = "http://localhost:8085/api/v1/write";
 
-    private final String pathToJsAsyncApplicationProducerConfig = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressAsyncApplicationProducerConfig.js";
-    private final String prometheusUrlAsyncApplicationProducerConfig = "http://localhost:8093/api/v1/write";
+    private final String pathToStressProducerWebFlux = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressProducerWebFlux.js";
+    private final String prometheusUrlProducerWebFlux = "http://localhost:8093/api/v1/write";
 
-    private final String pathToJsLoadBalancer = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressLoadBalancer.js";
-    private final String prometheusUrlLoadBalancer = "http://localhost:8095/api/v1/write";
+    private final String pathToStressNginxLoadBalancer = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressNginxLoadBalancer.js";
+    private final String prometheusUrlNginxLoadBalancer = "http://localhost:8095/api/v1/write";
 
     public void stressTest() {
         ExecutorService executor = Executors.newFixedThreadPool(5);
@@ -36,19 +36,19 @@ public class K6Service {
         });
 
         executor.submit(() -> {
-            stressTestUtil.stress(pathToJsAsyncApplication, prometheusUrlAsyncApplication);
+            stressTestUtil.stress(pathToStressFuture, prometheusUrlFuture);
         });
 
         executor.submit(() -> {
-            stressTestUtil.stress(pathToJsAsyncConfigApplication, prometheusUrlAsyncConfigApplication);
+            stressTestUtil.stress(pathToStressWebFlux, prometheusUrlWebFlux);
         });
 
         executor.submit(() -> {
-            stressTestUtil.stress(pathToJsAsyncApplicationProducerConfig, prometheusUrlAsyncApplicationProducerConfig);
+            stressTestUtil.stress(pathToStressProducerWebFlux, prometheusUrlProducerWebFlux);
         });
 
         executor.submit(() -> {
-            stressTestUtil.stress(pathToJsLoadBalancer, prometheusUrlLoadBalancer);
+            stressTestUtil.stress(pathToStressNginxLoadBalancer, prometheusUrlNginxLoadBalancer);
         });
 
         executor.shutdown();

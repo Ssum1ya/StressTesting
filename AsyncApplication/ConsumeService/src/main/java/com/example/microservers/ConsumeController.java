@@ -17,6 +17,7 @@ public class ConsumeController {
 
     @PostMapping
     public CompletableFuture<ResponseEntity<ConsumeDTO>> process(@RequestBody ConsumeDTO request) {
-        return CompletableFuture.supplyAsync(() -> ResponseEntity.ok(new ConsumeDTO(consumeService.sendToProcess(request))));
+        return CompletableFuture.supplyAsync(() ->
+                ResponseEntity.ok(new ConsumeDTO(consumeService.sendToProcess(request))));
     }
 }

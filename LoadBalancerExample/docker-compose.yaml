@@ -30,6 +30,22 @@ services:
     depends_on:
       - app-consumer-1
       - app-consumer-2
+      - app-consumer-3
+      - app-consumer-4
+    networks:
+      - test-net
+
+  nginx-process:
+    image: nginx:alpine
+    ports:
+      - "8107:80"
+    volumes:
+      - ./nginx-process.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app-process-1
+      - app-process-2
+      - app-process-3
+      - app-process-4
     networks:
       - test-net
 
@@ -64,10 +80,46 @@ services:
   app-process-2:
     build: ./ProcessService2
     environment:
-      - SERVER_PORT=8084  # ← Spring Boot слушает 8083!
+      - SERVER_PORT=8084
     ports: [ "8102:8084" ]
     networks: [ test-net ]
     hostname: app-process-2
+
+  app-consumer-3:
+    build: ./ConsumeService3
+    environment:
+      - SERVER_PORT=8085
+    ports:
+      - "8103:8085"
+    networks:
+      - test-net
+    hostname: app-consumer-3
+
+  app-process-3:
+    build: ./ProcessService3
+    environment:
+      - SERVER_PORT=8086
+    ports: [ "8104:8086" ]
+    networks: [ test-net ]
+    hostname: app-process-3
+
+  app-consumer-4:
+    build: ./ConsumeService4
+    environment:
+      - SERVER_PORT=8087
+    ports:
+      - "8105:8087"
+    networks:
+      - test-net
+    hostname: app-consumer-4
+
+  app-process-4:
+    build: ./ProcessService4
+    environment:
+      - SERVER_PORT=8088
+    ports: [ "8106:8088" ]
+    networks: [ test-net ]
+    hostname: app-process-4
 
 networks:
   test-net:

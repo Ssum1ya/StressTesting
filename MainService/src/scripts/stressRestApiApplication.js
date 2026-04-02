@@ -1,17 +1,31 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { Trend, Gauge, Counter, Rate } from 'k6/metrics';
-import exec from 'k6/execution';
+import { Trend, Rate, Counter } from 'k6/metrics';
 
 export const options = {
-  vus: 150,
-  duration: '30s',
+  scenarios: {
+      constant_rps: {
+        executor: 'constant-arrival-rate',
+        rate: 900,
+        timeUnit: '1s',
+        duration: '1m',
+        preAllocatedVUs: 200,
+        maxVUs: 200,
+        exec: 'sendRequests',
+      },
+    },
+    thresholds: {
+      http_req_failed: ['rate<0.01'],
+      http_req_duration: ['p(95)<3000'],
+    },
 };
 
-const minLatency = new Trend('http_min_latency_ms', true);
+// собственные метрики
+const httpReqDuration = new Trend('http_req_duration_ms');
+const httpReqRate = new Rate('http_req_rate');
+const httpReqErrors = new Counter('http_req_errors');
 
-export default function () {
-
+export function sendRequests() {
   const payload = JSON.stringify({
     message: 'aokihary'
   });
@@ -22,10 +36,16 @@ export default function () {
     },
   };
 
-  const start = Date.now();
-  const response = http.post('http://localhost:8080/', payload, params);
-  const duration = Date.now() - start;
-  minLatency.add(duration);
+  const res = http.post('http://localhost:8080/', payload, params);
 
-  sleep(0.1);
+  const success = check(res, {
+    'status is 200': (r) => r.status === 200,
+  });
+
+  if (!success) {
+    httpReqErrors.add(1);
+  }
+
+  httpReqDuration.add(res.timings.duration);
+  httpReqRate.add(1);
 }

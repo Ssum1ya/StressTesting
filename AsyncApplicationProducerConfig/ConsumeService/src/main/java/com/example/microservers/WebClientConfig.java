@@ -18,9 +18,12 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient() {
         ConnectionProvider provider = ConnectionProvider.builder("custom")
-                .maxConnections(200)
+                .maxConnections(400)
                 .maxIdleTime(Duration.ofSeconds(20))
+                .maxLifeTime(Duration.ofMinutes(5))
                 .pendingAcquireMaxCount(1000)
+                .pendingAcquireTimeout(Duration.ofSeconds(10))
+                .metrics(true)
                 .build();
 
         return WebClient.builder()
@@ -28,8 +31,6 @@ public class WebClientConfig {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .clientConnector(new ReactorClientHttpConnector(
                         HttpClient.create(provider)
-                                .option(ChannelOption.SO_KEEPALIVE, true)
-                                .option(ChannelOption.TCP_NODELAY, true)
                 ))
                 .build();
     }

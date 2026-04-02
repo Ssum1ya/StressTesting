@@ -4,22 +4,20 @@ import { Trend, Rate, Counter } from 'k6/metrics';
 
 export const options = {
   scenarios: {
-    ramping_vus: {
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { duration: '20s', target: 50 },
-        { duration: '30s', target: 100 },
-        { duration: '20s', target: 50 },
-      ],
-      gracefulRampDown: '0s',
-      exec: 'sendRequests',
+      constant_rps: {
+        executor: 'constant-arrival-rate',
+        rate: 900,
+        timeUnit: '1s',
+        duration: '1m',
+        preAllocatedVUs: 200,
+        maxVUs: 200,
+        exec: 'sendRequests',
+      },
     },
-  },
-  thresholds: {
-    http_req_duration: ['p(95)<1000'],    // 95% ответов быстрее 1 сек
-    http_req_failed: ['rate<0.01'],        // меньше 1% ошибок
-  },
+    thresholds: {
+      http_req_failed: ['rate<0.01'],
+      http_req_duration: ['p(95)<3000'],
+    },
 };
 
 // собственные метрики
@@ -38,7 +36,7 @@ export function sendRequests() {
     },
   };
 
-  const res = http.post('http://localhost:8087/', payload, params);
+  const res = http.post('http://localhost:8087', payload, params);
 
   const success = check(res, {
     'status is 200': (r) => r.status === 200,

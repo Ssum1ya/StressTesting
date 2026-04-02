@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+    implementation("io.micrometer:micrometer-core:1.16.3")
+
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
 

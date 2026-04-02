@@ -20,6 +20,7 @@ public class StressTestUtil {
 
         Map<String, String> env = pb.environment();
         env.put("K6_PROMETHEUS_RW_SERVER_URL", prometheusUrl);
+        env.put("K6_PROMETHEUS_RW_TREND_STATS", "avg,med,min,max,p(90),p(95),p(99)");
 
         try {
             Process process = pb.start();

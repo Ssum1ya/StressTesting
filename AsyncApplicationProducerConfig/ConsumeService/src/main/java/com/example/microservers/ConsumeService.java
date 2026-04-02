@@ -6,6 +6,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
+
 @Service
 @RequiredArgsConstructor
 public class ConsumeService {
@@ -17,6 +19,7 @@ public class ConsumeService {
                 .bodyValue(dto)
                 .retrieve()
                 .bodyToMono(ConsumeDTO.class)
-                .publishOn(Schedulers.parallel());
+                .publishOn(Schedulers.parallel())
+                .timeout(Duration.ofSeconds(10));
     }
 }
