@@ -1,35 +1,61 @@
 version: '3.8'
 
 services:
-  prometheus:
-    image: prom/prometheus:latest
-    ports: ["9090:9090"]
+  db:
+    image: postgres:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.enable-remote-write-receiver'
-    networks: [test-net]
-
-  grafana:
-    image: grafana/grafana:latest
-    ports: ["3000:3000"]
+      - new_pgdata:/var/lib/postgresql/data
+    container_name: db
+    restart: always
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      PGDATA: /var/lib/postgresql/data/new_pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    command: >
+      postgres
+        -c max_connections=200
+        -c shared_buffers=64MB
+        -c work_mem=4MB
+        -c maintenance_work_mem=32MB
+        -c effective_cache_size=128MB
+    ports:
+      - "5434:5432"
     networks: [test-net]
-    depends_on: [prometheus]
 
   app-consumer:
     build: ./ConsumeService
     ports: ["8080:8080"]
     networks: [test-net]
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+        reservations:
+          cpus: '1.0'
+          memory: 256M
 
   app-process:
     build: ./ProcessService
     ports: ["8081:8080"]
     networks: [test-net]
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+        reservations:
+          cpus: '1.0'
+          memory: 256M
+
+volumes:
+  new_pgdata:
 
 networks:
   test-net:

@@ -1,0 +1,13 @@
+# prometheus.yml
+scrape_configs:
+  - job_name: 'spring-mvc-http'
+    static_configs:
+      - targets: ['app-mvc:8080']
+        labels:
+          variant: 'mvc-http'
+
+  - job_name: 'webflux-http'
+    static_configs:
+      - targets: ['app-webflux:8080']
+        labels:
+          variant: 'webflux-http'

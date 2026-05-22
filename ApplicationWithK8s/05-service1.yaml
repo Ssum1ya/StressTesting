@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service1
+  namespace: benchmark
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: service1
+  template:
+    metadata:
+      labels:
+        app: service1
+    spec:
+      containers:
+        - name: service1
+          # Замени на свой образ: docker build -t your-registry/service1:latest .
+          image: service1:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: "0.1"
+              memory: 128Mi
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms256m -Xmx256m -XX:MaxMetaspaceSize=128m"
+            # Сервис 1 обращается к сервису 2 через K8s DNS
+            - name: SERVICE2_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: service2-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service1-service
+  namespace: benchmark
+spec:
+  selector:
+    app: service1
+  ports:
+    - port: 8080
+      targetPort: 8080
+  # ClusterIP — балансировка между 3 репликами встроена в K8s Service
+  type: ClusterIP

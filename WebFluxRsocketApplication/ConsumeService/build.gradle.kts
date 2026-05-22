@@ -1,0 +1,47 @@
+plugins {
+	java
+	id("org.springframework.boot") version "4.0.4"
+	id("io.spring.dependency-management") version "1.1.7"
+}
+
+group = "com.example"
+version = "0.0.1-SNAPSHOT"
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom(configurations.annotationProcessor.get())
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.0.1")
+
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
+
+	implementation("org.springframework.boot:spring-boot-starter-rsocket")
+	testImplementation("org.springframework.boot:spring-boot-starter-rsocket-test")
+
+    implementation("org.springframework.boot:spring-boot-starter-webclient")
+    testImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
+
+	compileOnly("org.projectlombok:lombok")
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	annotationProcessor("org.projectlombok:lombok")
+
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
+}

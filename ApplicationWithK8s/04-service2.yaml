@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service2
+  namespace: benchmark
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: service2
+  template:
+    metadata:
+      labels:
+        app: service2
+    spec:
+      containers:
+        - name: service2
+          # Замени на свой образ: docker build -t your-registry/service2:latest .
+          image: service2:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: "0.1"
+              memory: 128Mi
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms256m -Xmx256m -XX:MaxMetaspaceSize=128m"
+            - name: SPRING_R2DBC_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: url
+            - name: SPRING_R2DBC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: SPRING_R2DBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: SPRING_R2DBC_POOL_MAX_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: db-pool-size
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service2-service
+  namespace: benchmark
+spec:
+  selector:
+    app: service2
+  ports:
+    - port: 8080
+      targetPort: 8080
+  # ClusterIP — сервис 2 недоступен снаружи, только для сервиса 1
+  type: ClusterIP

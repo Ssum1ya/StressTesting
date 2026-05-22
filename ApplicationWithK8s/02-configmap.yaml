@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: benchmark
+data:
+  # Сервис 1 ходит на сервис 2 по этому адресу
+  service2-url: "http://service2-service:8080"
+  # Размер пула коннектов — одинаковый для всех
+  db-pool-size: "50"

@@ -9,11 +9,12 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class StressTestUtil {
 
-    public void stress(String pathToJs, String prometheusUrl) {
+    public void stress(String pathToJs, String prometheusUrl, String variant) {
         ProcessBuilder pb = new ProcessBuilder(
                 "k6", "run",
                 pathToJs,
-                "--out", "experimental-prometheus-rw"
+                "--out", "experimental-prometheus-rw",
+                "-e", "VARIANT=" + variant
         );
 
         pb.inheritIO();
@@ -29,9 +30,6 @@ public class StressTestUtil {
 
             if (finished) {
                 System.out.println("✅ K6 тест завершён!");
-            } else {
-                System.out.println("⏰ K6 тест превысил 60 сек, останавливаем...");
-                process.destroy();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

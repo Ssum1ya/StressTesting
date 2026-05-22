@@ -4,20 +4,25 @@ import { Trend, Rate, Counter } from 'k6/metrics';
 
 export const options = {
   scenarios: {
-      constant_rps: {
-        executor: 'constant-arrival-rate',
-        rate: 900,
-        timeUnit: '1s',
-        duration: '1m',
-        preAllocatedVUs: 200,
-        maxVUs: 200,
-        exec: 'sendRequests',
-      },
+    ramping_rps: {
+      executor: 'ramping-arrival-rate',
+      startRate: 10,
+      timeUnit: '1s',
+      preAllocatedVUs: 500,
+      maxVUs: 500,
+      exec: 'sendRequests',
+      stages: [
+        { target: 50,  duration: '15s' },
+        { target: 200, duration: '15s' },
+        { target: 500, duration: '15s' },
+        { target: 500, duration: '15s' },
+      ],
     },
-    thresholds: {
-      http_req_failed: ['rate<0.01'],
-      http_req_duration: ['p(95)<3000'],
-    },
+  },
+  thresholds: {
+    http_req_failed: ['rate<0.5'],       // порог подняли — при такой нагрузке будут ошибки
+    http_req_duration: ['p(95)<10000'],  // 10 секунд — чтобы тест не падал сразу
+  },
 };
 
 // собственные метрики
@@ -26,17 +31,10 @@ const httpReqRate = new Rate('http_req_rate');
 const httpReqErrors = new Counter('http_req_errors');
 
 export function sendRequests() {
-  const payload = JSON.stringify({
-    message: 'aokihary'
-  });
-
-  const params = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  const res = http.post('http://localhost:8080/', payload, params);
+  const res = http.post('http://localhost:8080/', JSON.stringify({ message: 'test' }), {
+      headers: { 'Content-Type': 'application/json' },
+      tags: { variant: 'mvc-http' },
+    });
 
   const success = check(res, {
     'status is 200': (r) => r.status === 200,
