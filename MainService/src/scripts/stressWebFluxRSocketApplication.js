@@ -1,22 +1,25 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { Trend, Rate, Counter } from 'k6/metrics';
+//import { Trend, Rate, Counter } from 'k6/metrics';
+
+const VARIANT = __ENV.VARIANT;
 
 export const options = {
+  tags: { variant: VARIANT },
   scenarios: {
     ramping_rps: {
       executor: 'ramping-arrival-rate',
-      startRate: 10,
+      startRate: 50,
       timeUnit: '1s',
       preAllocatedVUs: 500,
       maxVUs: 500,
       exec: 'sendRequests',
       stages: [
-          { target: 50,  duration: '15s' },
-          { target: 200, duration: '15s' },
-          { target: 500, duration: '15s' },
-          { target: 500, duration: '15s' },
-        ],
+              { target: 100,  duration: '15s' },
+              { target: 200, duration: '15s' },
+              { target: 500, duration: '15s' },
+              { target: 500, duration: '15s' },
+            ],
     },
   },
   thresholds: {
@@ -24,11 +27,6 @@ export const options = {
     http_req_duration: ['p(95)<10000'],  // 10 секунд — чтобы тест не падал сразу
   },
 };
-
-// собственные метрики
-const httpReqDuration = new Trend('http_req_duration_ms');
-const httpReqRate = new Rate('http_req_rate');
-const httpReqErrors = new Counter('http_req_errors');
 
 export function sendRequests() {
   const res = http.post('http://localhost:8082/', JSON.stringify({ message: 'test' }), {
@@ -39,11 +37,4 @@ export function sendRequests() {
   const success = check(res, {
     'status is 200': (r) => r.status === 200,
   });
-
-  if (!success) {
-    httpReqErrors.add(1);
-  }
-
-  httpReqDuration.add(res.timings.duration);
-  httpReqRate.add(1);
 }

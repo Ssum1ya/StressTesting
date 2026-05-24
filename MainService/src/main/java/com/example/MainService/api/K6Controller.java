@@ -1,4 +1,4 @@
-package com.example.MainService;
+package com.example.MainService.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

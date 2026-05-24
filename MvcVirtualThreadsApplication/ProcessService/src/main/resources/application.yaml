@@ -1,0 +1,16 @@
+kind: Application
+
+spring:
+  application:
+    name: demo
+  datasource:
+    url: jdbc:postgresql://db:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 50
+  threads:
+    virtual:
+      enabled: true

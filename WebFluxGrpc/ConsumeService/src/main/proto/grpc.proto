@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "com.example.grpc";
+option java_outer_classname = "ProcessProto";
+
+service ProcessService {
+  rpc Process (ProcessRequest) returns (ProcessResponse);
+}
+
+message ProcessRequest {
+  string message = 1;
+}
+
+message ProcessResponse {
+  string message = 1;
+}

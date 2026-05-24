@@ -16,8 +16,8 @@ spec:
       containers:
         - name: service2
           # Замени на свой образ: docker build -t your-registry/service2:latest .
-          image: service2:latest
-          imagePullPolicy: Never
+          image: service22:latest
+          # imagePullPolicy: Never
           ports:
             - containerPort: 8080
           resources:

@@ -16,6 +16,7 @@ public class ConsumeController {
 
     @PostMapping
     public ResponseEntity<String> process(@RequestBody ConsumeDTO request) {
+        log.info("request accepted");
         String answer = consumeService.sendToProcess(request);
 
         return ResponseEntity.ok(answer);

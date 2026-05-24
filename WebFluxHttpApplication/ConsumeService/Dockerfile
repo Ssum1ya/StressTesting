@@ -1,5 +1,5 @@
 # Этап 1: Сборка приложения
-FROM gradle:8.14-jdk17 AS builder
+FROM gradle:jdk26 AS builder
 WORKDIR /app
 
 # Копируем gradle файлы для кэширования зависимостей
@@ -12,7 +12,7 @@ COPY src ./src
 RUN gradle bootJar --no-daemon
 
 # Этап 2: Запуск приложения
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:26-jre-jammy
 WORKDIR /app
 
 # Копируем собранный JAR из этапа сборки

@@ -16,6 +16,7 @@ public class ConsumeController {
 
     @PostMapping
     public Mono<ConsumeDTO> process(@RequestBody ConsumeDTO request) {
+        log.info("request accepted");
         return consumeService.sendToProcess(request);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.MainService;
+package com.example.MainService.api;
 
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class StressTestUtil {
 
         Map<String, String> env = pb.environment();
         env.put("K6_PROMETHEUS_RW_SERVER_URL", prometheusUrl);
-        env.put("K6_PROMETHEUS_RW_TREND_STATS", "avg,med,min,max,p(90),p(95),p(99)");
+        env.put("K6_PROMETHEUS_RW_PUSH_INTERVAL", "200ms");
 
         try {
             Process process = pb.start();
@@ -30,6 +30,7 @@ public class StressTestUtil {
 
             if (finished) {
                 System.out.println("✅ K6 тест завершён!");
+                Thread.sleep(5000);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
