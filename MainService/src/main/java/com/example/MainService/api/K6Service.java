@@ -15,25 +15,20 @@ public class K6Service {
     private final String prometheusUrl = "http://localhost:9090/api/v1/write";
 
     private final String pathToStressMvcHttpApplication = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressMvcHttpApplication.js";
-//    private final String prometheusUrlRestApiApplication = "http://localhost:9090/api/v1/write";
-
     private final String pathToStressWebFluxHttpApplication = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressWebFluxHttpApplication.js";
-//    private final String prometheusUrlWebFlux = "http://localhost:8089/api/v1/write";
-
     private final String pathToStressWebFluxRSocketApplication = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressWebFluxRSocketApplication.js";
-//    private final String prometheusUrlFuture = "http://localhost:8085/api/v1/write";
-
-//    private final String pathToStressProducerWebFlux = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressProducerWebFlux.js";
-//    private final String prometheusUrlProducerWebFlux = "http://localhost:8093/api/v1/write";
-//
-//    private final String pathToStressNginxLoadBalancer = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressNginxLoadBalancer.js";
-//    private final String prometheusUrlNginxLoadBalancer = "http://localhost:8095/api/v1/write";
+    private final String pathToStressMvcVirtual = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/stressMvcVirtualThreadsApplication.js";
+    private final String pathToStressKubernetesApp = "C:/Users/Proger/Desktop/ItSchoolProject/MainService/src/scripts/kubernetesApp.js";
 
     public void stressTest() {
         ExecutorService executor = Executors.newFixedThreadPool(5);
 
         executor.submit(() -> {
             stressTestUtil.stress(pathToStressMvcHttpApplication, prometheusUrl, "mvc-http");
+        });
+
+        executor.submit(() -> {
+            stressTestUtil.stress(pathToStressMvcVirtual, prometheusUrl, "mvc-virtual");
         });
 
         executor.submit(() -> {
@@ -44,13 +39,9 @@ public class K6Service {
             stressTestUtil.stress(pathToStressWebFluxRSocketApplication, prometheusUrl, "webflux-rsocket");
         });
 
-//        executor.submit(() -> {
-//            stressTestUtil.stress(pathToStressProducerWebFlux, prometheusUrlProducerWebFlux);
-//        });
-//
-//        executor.submit(() -> {
-//            stressTestUtil.stress(pathToStressNginxLoadBalancer, prometheusUrlNginxLoadBalancer);
-//        });
+        executor.submit(() -> {
+            stressTestUtil.stress(pathToStressKubernetesApp, prometheusUrl, "kubernetes-app");
+        });
 
         executor.shutdown();
     }
